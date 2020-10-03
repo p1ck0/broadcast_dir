@@ -8,29 +8,29 @@ import (
 
 //Client is the structure of the client
 type Client struct {
-    addr *string
-    ip, port *string
+    addr string
+    ip, Port string
     dir *string
-    buff *int
+    buff int
     files *[]net.Conn
-    aconns *map[net.Conn]bool
-    dconns *chan net.Conn
-    TCPconns *chan net.Conn
+    dconns chan net.Conn
+    TCPconns chan net.Conn
 }
 
 
 //Run func for run a client on a local network
 func (client *Client) Run() {
-    *client.ip, _ = getLocalIP()
-    *client.addr = net.JoinHostPort(*client.ip, *client.port)
-    *client.dconns = make(chan net.Conn, 1)
-    *client.TCPconns = make(chan net.Conn, 1)
-    *client.buff = 2048
+    client.ip = "127.0.0.1"
+    fmt.Println(client.ip)
+    client.addr = net.JoinHostPort(client.ip, client.Port)
+    client.dconns = make(chan net.Conn, 1)
+    client.TCPconns = make(chan net.Conn, 1)
+    client.buff = 1024
     client.listen()
 }
 
 func (client *Client) listen() {
-    tcpaddr, _ := net.ResolveTCPAddr("tcp", *client.addr)
+    tcpaddr, _ := net.ResolveTCPAddr("tcp", client.addr)
     ln, _ := net.ListenTCP("tcp", tcpaddr)
     defer ln.Close()
     go func() {
@@ -39,21 +39,19 @@ func (client *Client) listen() {
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
-			*client.TCPconns <- conn
+			client.TCPconns <- conn
         }
     }()
+    client.handle()
 }
 
 func (client *Client) handle() {
     for {
         select {
-        case conn := <-*client.TCPconns:
-            fmt.Println(conn)
+        case conn := <-client.TCPconns:
             go client.reciveConn(&conn)
-        case dconn := <-*client.dconns:
-            defer dconn.Close()
-            log.Printf("Client %v was gone\n", dconn)
-            delete(*client.aconns, dconn)
+        case dconn := <-client.dconns:
+            dconn.Close()
         }
     }
 }
