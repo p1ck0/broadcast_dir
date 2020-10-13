@@ -8,14 +8,14 @@ import (
 
 //Client is the structure of the client
 type Client struct {
-	addr          string
-	ip, Port      string
-	dir           *string
-	buff          int
-	files         *[]net.Conn
-	local_clients []string
-	dconns        chan net.Conn
-	TCPconns      chan net.Conn
+	addr         string
+	ip, Port     string
+	dir          *string
+	buff         int
+	files        *[]net.Conn
+	LocalСlients []string
+	dconns       chan net.Conn
+	TCPconns     chan net.Conn
 }
 
 //Run func for run a client on a local network

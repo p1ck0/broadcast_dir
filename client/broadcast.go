@@ -6,17 +6,17 @@ import (
 	"net"
 )
 
-func (client *Client) BroadCast(filename *string) {
-	file, _ := ioutil.ReadFile("broadcast_dir/" + *filename)
+func (client *Client) BroadCast(filename string) {
+	file, _ := ioutil.ReadFile("broadcast_dir/" + filename)
 	var pack = &packageTCP{
 		From: head{
-			Filename: *filename,
+			Filename: filename,
 		},
 		Body: file,
 	}
 	data, _ := json.Marshal(pack)
 	go func() {
-		for _, clientIP := range client.local_clients {
+		for _, clientIP := range client.LocalСlients {
 			conn, _ := net.Dial("tcp", clientIP)
 			defer conn.Close()
 			conn.Write(data)

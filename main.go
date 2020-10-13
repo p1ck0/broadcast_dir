@@ -1,18 +1,25 @@
 package main
 
 import (
-    util "github.com/p1ck0/broadcast_dir/util"
-    "github.com/p1ck0/broadcast_dir/client"
+	"sync"
+
+	"github.com/p1ck0/broadcast_dir/client"
+	util "github.com/p1ck0/broadcast_dir/util"
 )
 
 func init() {
-    util.CreateDir("broadcast_dir")
+	util.CreateDir("broadcast_dir")
 }
 
+var wg sync.WaitGroup
 
 func main() {
-    cl := &client.Client{
-        Port : "1488",
-    }
-    cl.Run()
+	wg.Add(1)
+	cl := &client.Client{
+		Port:         "1488",
+		LocalСlients: []string{"127.0.0.1:1489"},
+	}
+	go cl.Run()
+	go util.Notify(cl)
+	wg.Wait()
 }
