@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"log"
 	"path"
 	"strings"
@@ -27,7 +26,6 @@ func Notify(client *client.Client) {
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create {
 					pathf := strings.ReplaceAll(event.Name, `\`, "/")
-					fmt.Println(pathf)
 					client.BroadCast(path.Base(pathf))
 				}
 			case err, ok := <-watcher.Errors:
@@ -39,7 +37,7 @@ func Notify(client *client.Client) {
 		}
 	}()
 
-	err = watcher.Add("C:/Users/хихи/broadcast_dir/broadcast_dir")
+	err = watcher.Add("/home/chrxxx/Рабочий стол/broadcast_dir/broadcast_dir/")
 	if err != nil {
 		log.Fatal(err)
 	}

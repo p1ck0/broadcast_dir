@@ -12,7 +12,7 @@ type Client struct {
 	ip, Port     string
 	dir          *string
 	buff         int
-	files        *[]net.Conn
+	files        map[[32]byte]bool
 	LocalСlients []string
 	dconns       chan net.Conn
 	TCPconns     chan net.Conn
@@ -25,6 +25,7 @@ func (client *Client) Run() {
 	client.addr = net.JoinHostPort(client.ip, client.Port)
 	client.dconns = make(chan net.Conn, 1)
 	client.TCPconns = make(chan net.Conn, 1)
+	client.files = make(map[[32]byte]bool)
 	client.buff = 1024
 	client.listen()
 }
