@@ -16,8 +16,8 @@ var wg sync.WaitGroup
 func main() {
 	wg.Add(1)
 	cl := &client.Client{
-		Port:         "1488",
-		LocalСlients: []string{"127.0.0.1:1489"},
+		Port:         ,
+		LocalСlients: []string{},
 	}
 	go cl.Run()
 	go util.Notify(cl)
