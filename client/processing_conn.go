@@ -2,7 +2,7 @@ package client
 
 import (
 	"bufio"
-	"fmt"
+	"bytes"
 	"io"
 	"net"
 	"os"
@@ -11,10 +11,13 @@ import (
 
 func (client *Client) reciveConn(conn *net.Conn) {
 	reader := bufio.NewReader(*conn)
+	sum, _ := reader.ReadString('\n')
+	sum = strings.TrimSpace(sum)
 	line, _ := reader.ReadString('\n')
 	line = strings.TrimSpace(line)
-	fmt.Println(line)
-	file, _ := os.Create("broadcast_dir/" + line)
-	io.Copy(file, *conn)
+	if checkSum := client.files[line]; !bytes.Equal(checkSum[:], []byte(sum)) {
+		file, _ := os.Create("broadcast_dir/" + line)
+		io.Copy(file, *conn)
+	}
 	client.dconns <- *conn
 }
