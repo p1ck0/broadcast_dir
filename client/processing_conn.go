@@ -17,7 +17,6 @@ func (client *Client) reciveConn(conn *net.Conn) {
 	line, _ := reader.ReadString('\n')
 	line = strings.TrimSpace(line)
 	if checkSum := client.Files[line]; !bytes.Equal(checkSum[:], []byte(sumb)) {
-		fmt.Println("принял", line)
 		file, _ := os.Create("broadcast_dir/" + line)
 		defer file.Close()
 		_, err := io.Copy(file, *conn)
