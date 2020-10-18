@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/p1ck0/broadcast_dir/client"
-	util "github.com/p1ck0/broadcast_dir/util"
+	"github.com/p1ck0/broadcast_dir/util"
 )
 
 func init() {

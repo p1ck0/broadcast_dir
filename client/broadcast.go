@@ -1,28 +1,32 @@
 package client
 
 import (
-	"bufio"
-	"crypto/sha256"
 	"fmt"
 	"io"
 	"net"
 	"os"
+	"sync"
 )
+
+var wg sync.WaitGroup
 
 func (client *Client) BroadCast(filename string) {
 	file, err := os.Open("broadcast_dir/" + filename)
 	if err != nil {
 		fmt.Println(err)
 	}
-	s := bufio.NewScanner(file)
-	sum := sha256.Sum256(s.Bytes())
-	client.files[filename] = sum
-	go func() {
-		defer file.Close()
-		for _, clientIP := range client.LocalСlients {
-			conn, _ := net.Dial("tcp", clientIP)
+
+	for _, clientIP := range client.LocalСlients {
+		wg.Add(1)
+		go func(clientIP string) {
+			defer wg.Done()
+			conn, err := net.Dial("tcp", clientIP)
+			if err != nil {
+				fmt.Println(err)
+			}
 			defer conn.Close()
-			_, err := io.WriteString(conn, fmt.Sprintf("%s\n", string(sum[:])))
+			sum := client.Files[filename]
+			_, err = io.WriteString(conn, fmt.Sprintf("%s\n", string(sum[:])))
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -34,6 +38,8 @@ func (client *Client) BroadCast(filename string) {
 			if err != nil {
 				fmt.Println(err)
 			}
-		}
-	}()
+		}(clientIP)
+	}
+	wg.Wait()
+	file.Close()
 }

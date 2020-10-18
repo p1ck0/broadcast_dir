@@ -1,7 +1,11 @@
 package util
 
 import (
+	"bufio"
+	"crypto/sha256"
+	"fmt"
 	"log"
+	"os"
 	"path"
 	"strings"
 
@@ -26,6 +30,14 @@ func Notify(client *client.Client) {
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create {
 					pathf := strings.ReplaceAll(event.Name, `\`, "/")
+					file, err := os.Open("broadcast_dir/" + path.Base(pathf))
+					if err != nil {
+						fmt.Println(err)
+					}
+					s := bufio.NewScanner(file)
+					file.Close()
+					sum := sha256.Sum256(s.Bytes())
+					client.Files[path.Base(pathf)] = sum
 					client.BroadCast(path.Base(pathf))
 				}
 			case err, ok := <-watcher.Errors:
