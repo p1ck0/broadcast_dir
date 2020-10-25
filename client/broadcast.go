@@ -11,20 +11,18 @@ import (
 var wg sync.WaitGroup
 
 func (client *Client) BroadCast(filename string) {
-	file, err := os.Open("broadcast_dir/" + filename)
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	for _, clientIP := range client.LocalСlients {
 		wg.Add(1)
 		go func(clientIP string) {
 			defer wg.Done()
+			file, err := os.Open("broadcast_dir/" + filename)
+			if err != nil {
+				fmt.Println(err)
+			}
 			conn, err := net.Dial("tcp", clientIP)
 			if err != nil {
 				fmt.Println(err)
 			}
-			defer conn.Close()
 			sum := client.Files[filename]
 			_, err = io.WriteString(conn, fmt.Sprintf("%s\n", string(sum[:])))
 			if err != nil {
@@ -34,12 +32,11 @@ func (client *Client) BroadCast(filename string) {
 			if err != nil {
 				fmt.Println(err)
 			}
-			_, err = io.Copy(conn, file)
-			if err != nil {
-				fmt.Println(err)
-			}
+			n, err := io.Copy(conn, file)
+			fmt.Println(n)
+			file.Close()
+			conn.Close()
 		}(clientIP)
 	}
 	wg.Wait()
-	file.Close()
 }

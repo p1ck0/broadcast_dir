@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/p1ck0/broadcast_dir/client"
@@ -29,6 +30,7 @@ func Notify(client *client.Client) {
 					return
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create {
+					time.Sleep(3000 * time.Millisecond)
 					pathf := strings.ReplaceAll(event.Name, `\`, "/")
 					file, err := os.Open("broadcast_dir/" + path.Base(pathf))
 					if err != nil {
