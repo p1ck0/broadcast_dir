@@ -17,7 +17,7 @@ func main() {
 	wg.Add(1)
 	cl := &client.Client{
 		Port:         "1488",
-		LocalСlients: []string{"127.0.0.1:1489"},
+		LocalСlients: []string{"192.168.0.105:1488"},
 	}
 	go cl.Run()
 	go util.Notify(cl)

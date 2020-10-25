@@ -1,0 +1,40 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"os"
+	"strings"
+)
+
+func main() {
+	tcpaddr, _ := net.ResolveTCPAddr("tcp", "127.0.0.1:1490")
+	ln, _ := net.ListenTCP("tcp", tcpaddr)
+	defer ln.Close()
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		handle(conn)
+	}
+}
+
+func handle(conn net.Conn) {
+	reader := bufio.NewReader(conn)
+	sumb, _ := reader.ReadString('\n')
+	sumb = strings.TrimSpace(sumb)
+	line, _ := reader.ReadString('\n')
+	line = strings.TrimSpace(line)
+	file, _ := os.Create(line)
+	defer file.Close()
+	var buf = make([]byte, 16*1024)
+	_, err := io.CopyBuffer(file, conn, buf)
+	if err != nil {
+		fmt.Println("тут", err)
+	}
+	conn.Close()
+}

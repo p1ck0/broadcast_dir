@@ -32,8 +32,9 @@ func (client *Client) BroadCast(filename string) {
 			if err != nil {
 				fmt.Println(err)
 			}
-			n, err := io.Copy(conn, file)
-			fmt.Println(n)
+			var buf = make([]byte, 32*1024)
+			n, err := io.CopyBuffer(conn, file, buf)
+			fmt.Println(filename, n)
 			file.Close()
 			conn.Close()
 		}(clientIP)

@@ -51,7 +51,7 @@ func Notify(client *client.Client) {
 		}
 	}()
 
-	err = watcher.Add("/home/chrxxx/Рабочий стол/broadcast_dir/broadcast_dir/")
+	err = watcher.Add("/home/chrxxx/Рабочий стол/code/broadcast_dir/broadcast_dir/")
 	if err != nil {
 		log.Fatal(err)
 	}
