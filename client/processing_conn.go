@@ -19,7 +19,8 @@ func (client *Client) reciveConn(conn *net.Conn) {
 	if checkSum := client.Files[line]; !bytes.Equal(checkSum[:], []byte(sumb)) {
 		file, _ := os.Create("broadcast_dir/" + line)
 		defer file.Close()
-		_, err := io.Copy(file, *conn)
+		var buf = make([]byte, 32*1024)
+		_, err := io.CopyBuffer(file, *conn, buf)
 		if err != nil {
 			fmt.Println(err)
 		}
