@@ -41,6 +41,13 @@ func Notify(client *client.Client) {
 					sum := sha256.Sum256(s.Bytes())
 					client.Files[path.Base(pathf)] = sum
 					client.BroadCast(path.Base(pathf))
+				} else if event.Op&fsnotify.Rename == fsnotify.Rename {
+					pathf := strings.ReplaceAll(event.Name, `\`, "/")
+					fmt.Println(pathf)
+					delete(client.Files, path.Base(pathf))
+					fmt.Println(client.Files)
+				} else {
+					fmt.Println(event.Op)
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
@@ -51,7 +58,7 @@ func Notify(client *client.Client) {
 		}
 	}()
 
-	err = watcher.Add("/home/chrxxx/Рабочий стол/code/broadcast_dir/broadcast_dir/")
+	err = watcher.Add(gwd() + "/broadcast_dir")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -11,6 +12,9 @@ import (
 var wg sync.WaitGroup
 
 func (client *Client) BroadCast(filename string) {
+	var pack = packageTCP{
+		Filename: filename,
+	}
 	for _, clientIP := range client.LocalСlients {
 		wg.Add(1)
 		go func(clientIP string) {
@@ -22,16 +26,15 @@ func (client *Client) BroadCast(filename string) {
 			conn, err := net.Dial("tcp", clientIP)
 			if err != nil {
 				fmt.Println(err)
+				return
 			}
 			sum := client.Files[filename]
-			_, err = io.WriteString(conn, fmt.Sprintf("%s\n", string(sum[:])))
+			pack.SHA256 = sum
+			jsonpack, _ := json.Marshal(pack)
 			if err != nil {
 				fmt.Println(err)
 			}
-			_, err = io.WriteString(conn, fmt.Sprintf("%s\n", filename))
-			if err != nil {
-				fmt.Println(err)
-			}
+			conn.Write(jsonpack)
 			var buf = make([]byte, 32*1024)
 			n, err := io.CopyBuffer(conn, file, buf)
 			fmt.Println(filename, n)
